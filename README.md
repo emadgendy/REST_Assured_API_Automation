@@ -389,6 +389,6 @@ This project demonstrates practical understanding of:
 
 ## Author
 
-**Emad Gendy**
+**Emadendy**
 
 QA Automation Engineer | Java | Selenium | Cypress | REST Assured

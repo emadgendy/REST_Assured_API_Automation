@@ -67,7 +67,7 @@ public class UserTest extends BaseTest {
 
         User requestUser =
                 new User(
-                        "Emad R",
+                        "Emad G",
                         "Emadautomation",
                         "Emad@example.com"
                 );
