@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PassFailReportListener implements ITestListener {
@@ -39,6 +40,9 @@ public class PassFailReportListener implements ITestListener {
         long passed = results.stream().filter(r -> r.status.equals("PASS")).count();
         long failed = results.stream().filter(r -> r.status.equals("FAIL")).count();
         long skipped = results.stream().filter(r -> r.status.equals("SKIPPED")).count();
+        String suiteName = context.getSuite() == null
+                ? ""
+                : context.getSuite().getName();
 
         StringBuilder html = new StringBuilder();
         html.append("<!doctype html><html><head><meta charset=\"UTF-8\">")
@@ -53,17 +57,22 @@ public class PassFailReportListener implements ITestListener {
             .append(".FAIL{color:#d73a49;font-weight:bold}.SKIPPED{color:#9a6700;font-weight:bold}")
             .append("</style></head><body>")
             .append("<h1>API Test Pass/Fail Report</h1>")
+            .append("<p><strong>Suite:</strong> ")
+            .append(escape(suiteName))
+            .append("</p>")
             .append("<div class=\"summary\">")
             .append("<div class=\"card pass\">PASS: ").append(passed).append("</div>")
             .append("<div class=\"card fail\">FAIL: ").append(failed).append("</div>")
             .append("<div class=\"card skipped\">SKIPPED: ").append(skipped).append("</div>")
             .append("</div>")
-            .append("<table><tr><th>Test</th><th>Class</th><th>Status</th><th>Duration (ms)</th><th>Details</th></tr>");
+            .append("<table><tr><th>Test Scenario</th><th>Class</th><th>Groups</th><th>Parameters</th><th>Status</th><th>Duration (ms)</th><th>Details</th></tr>");
 
         for (TestEntry entry : results) {
             html.append("<tr>")
                 .append("<td>").append(escape(entry.testName)).append("</td>")
                 .append("<td>").append(escape(entry.className)).append("</td>")
+                .append("<td>").append(escape(entry.groups)).append("</td>")
+                .append("<td>").append(escape(entry.parameters)).append("</td>")
                 .append("<td class=\"").append(entry.status).append("\">").append(entry.status).append("</td>")
                 .append("<td>").append(entry.durationMs).append("</td>")
                 .append("<td>").append(escape(entry.details)).append("</td>")
@@ -102,6 +111,8 @@ public class PassFailReportListener implements ITestListener {
     private record TestEntry(
             String testName,
             String className,
+            String groups,
+            String parameters,
             String status,
             long durationMs,
             String details) {
@@ -115,9 +126,19 @@ public class PassFailReportListener implements ITestListener {
                 details = result.getThrowable().getMessage();
             }
 
+            String groups = result.getMethod().getGroups().length == 0
+                    ? ""
+                    : String.join(", ", result.getMethod().getGroups());
+            String parameters = result.getParameters() == null
+                    || result.getParameters().length == 0
+                    ? ""
+                    : Arrays.toString(result.getParameters());
+
             return new TestEntry(
                     result.getMethod().getMethodName(),
                     result.getTestClass().getName(),
+                    groups,
+                    parameters,
                     status,
                     result.getEndMillis() - result.getStartMillis(),
                     details

@@ -309,7 +309,7 @@ target/pass-fail-report.html
 ```
 
 The report includes the pass, fail and skipped totals, test names, classes,
-duration and failure details.
+TestNG groups, data-provider parameters, duration and failure details.
 
 ---
 
