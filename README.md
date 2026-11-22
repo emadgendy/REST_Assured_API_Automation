@@ -281,6 +281,19 @@ mvn clean test "-Dperformance.logging=true"
 
 Each log includes the HTTP method, URI, status code, response time in milliseconds and response size in bytes.
 
+Performance logs are printed in the Maven terminal. To save the complete
+Maven output and performance entries to a text file:
+
+```powershell
+mvn clean test "-Dperformance.logging=true" | Tee-Object -FilePath performance-log.txt
+```
+
+Open the generated file from the project root:
+
+```powershell
+code performance-log.txt
+```
+
 Normal execution uses:
 
 ```properties
